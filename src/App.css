@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  background-color: var(--bg-main);
+}
+.main {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 280px);
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+@media only screen and (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+  }
+  .main {
+    width: 100%;
+    height: auto;
+  }
+}
