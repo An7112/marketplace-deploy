@@ -4,25 +4,45 @@ import { MdEmail, MdPassword } from 'react-icons/md';
 import { FcGoogle } from 'react-icons/fc';
 import './auth.css'
 import { Link } from 'react-router-dom';
+import { Messages } from 'modal/index';
+import { ToastMessage } from 'component/toast-message';
+import QueryLoading from 'component/query-loading/query-loading';
 
 
 const Signup: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [displayName, setDisplayName] = useState('');
+    const [message, setMessage] = useState<Messages>({ title: null, status: null, description: null });
+    const [visible, setVisible] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsLoading(true)
         try {
             await signup(displayName, username, password);
             window.location.href = '/login';
         } catch (error) {
-            console.error(error);
+            if (error instanceof Error) {
+                setMessage({
+                    title: error.message,
+                    description: error.message,
+                    status: false
+                })
+                setVisible(true);
+            }
+        } finally {
+            setIsLoading(false)
         }
     };
 
     return (
         <div className='container'>
+            {visible === true ? <ToastMessage
+                {...message}
+            /> : ''}
+            {isLoading === true && <QueryLoading />}
             <div className='main'>
                 <div className='form-container'>
                     <h3>Signup</h3>
