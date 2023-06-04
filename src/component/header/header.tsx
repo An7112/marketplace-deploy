@@ -4,34 +4,34 @@ import { MdOutlineAttachMoney } from 'react-icons/md'
 import { BsFillCartCheckFill } from 'react-icons/bs'
 import { AiOutlineCaretDown } from 'react-icons/ai'
 import { IoSettingsOutline, IoLogOutOutline } from 'react-icons/io5'
-import { RiLoginCircleLine } from 'react-icons/ri'
 import './header.css'
 import { useDispatch, useSelector } from 'react-redux'
-import { loginWithGoogle, logoutUser, restoreUser } from 'store/actions/auth'
 import ShoppingCart from 'component/shopping-cart/shopping-cart'
 import { CartModal } from 'modal/index'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { setSearchValue } from 'store/reducers/state'
+import { refreshAccessToken } from 'pages/auth'
 
 export default function Header() {
+    const history = useNavigate();
     const dispatch = useDispatch();
     const { countInCart } = useSelector((state: any) => state.state);
     const [userInfoVisible, setUserInfoVisible] = useState(false);
     const [openCart, setOpenCart] = useState(false);
     const modalRef = useRef<HTMLDivElement>(null)
     const [cartCount, setCartCount] = useState(0);
-    const user = useSelector((state: any) => state.auth.user) ?? '';
+    const [redirectToLogin, setRedirectToLogin] = useState(false);
 
     useEffect(() => {
         const productsInCart: CartModal[] = JSON.parse(localStorage.getItem('cart') || '[]');
         setCartCount(productsInCart.length);
     }, [countInCart])
-    const handleLoginWithGoogle = () => {
-        dispatch(loginWithGoogle() as any);
-    };
 
     const handleLogout = () => {
-        dispatch(logoutUser() as any);
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('userId');
+        setRedirectToLogin(true);
     };
     const toggleUserInfoVisible = () => {
         setUserInfoVisible(prev => !prev);
@@ -51,13 +51,6 @@ export default function Header() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [modalRef, userInfoVisible]);
 
-
-    useEffect(() => {
-        const action = restoreUser();
-        if (action) {
-            dispatch(action);
-        }
-    }, [dispatch]);
     const callbackOpenCart = (callbackData: boolean) => {
         setOpenCart(callbackData)
     }
@@ -66,6 +59,34 @@ export default function Header() {
         const existingValue = event.target.value;
         dispatch(setSearchValue(existingValue))
     }
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                await refreshAccessToken();
+            } catch (error) {
+                setRedirectToLogin(true);
+            }
+        };
+
+        checkAuth();
+    }, [dispatch, history]);
+
+
+    useEffect(() => {
+        const accessToken = localStorage.getItem('accessToken');
+        const isLoggedIn = accessToken;
+        if (isLoggedIn == null) {
+            setRedirectToLogin(true);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (redirectToLogin) {
+            history('/login');
+        }
+    }, [history, redirectToLogin]);
+
     return (
         <>
             <div className='header'>
@@ -91,17 +112,10 @@ export default function Header() {
                                 <p>Settings</p>
                             </div>
                             <div className='line'></div>
-                            {user
-                                ?
-                                <div className='dropdown-item' onClick={handleLogout}>
-                                    <IoLogOutOutline />
-                                    <p>Logout</p>
-                                </div>
-                                : <div className='dropdown-item' onClick={handleLoginWithGoogle}>
-                                    <RiLoginCircleLine />
-                                    <p>Login</p>
-                                </div>
-                            }
+                            <div className='dropdown-item' onClick={handleLogout}>
+                                <IoLogOutOutline />
+                                <p>Logout</p>
+                            </div>
                         </div>
                     </div>
                 }
@@ -120,7 +134,7 @@ export default function Header() {
                         </div>
                         <div className='class-avatar' >
                             <span className='span-frame' onClick={toggleUserInfoVisible}>
-                                <img className='img-avatar' alt='user' src={user ? user.photoURL : '/media/avatar.avif'} />
+                                <img className='img-avatar' alt='user' src={'/media/avatar.avif'} />
                             </span>
                         </div>
                     </div>
