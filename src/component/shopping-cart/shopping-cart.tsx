@@ -22,7 +22,7 @@ export default function ShoppingCart({ propsCallback }: any) {
     const [count, setCount] = useState<number>(countInCart);
     const [isloading, setIsloading] = useState(false);
     const [buyLoading, setBuyLoading] = useState(false)
-    const user = useSelector((state: any) => state.auth.user) ?? ''
+    const user = localStorage.getItem('userId') ?? '';
     const [visible, setVisible] = useState(false);
     const [message, setMessage] = useState<Messages>({ title: null, status: null, description: null });
 
@@ -108,7 +108,7 @@ export default function ShoppingCart({ propsCallback }: any) {
     const buyProduct = async () => {
         if (shoppingCart.length > 0) {
             setBuyLoading(true);
-            const buyer = user.uid;
+            const buyer = user;
             const products = shoppingCart.map((element) => {
                 return { _id: element._id, quantity: 1 }
             })

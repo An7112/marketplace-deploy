@@ -30,7 +30,7 @@ export const UpdateModal: React.FC<IProps> = ({data, propsCallback}) => {
   })
   const [visible, setVisible] = useState(false);
   const [message, setMessage] = useState<Messages>({ title: null, status: null, description: null });
-  const user = useSelector((state: any) => state.auth.user) ?? '';
+  const user = localStorage.getItem('userId') ?? '';
   const [isloading, setIsLoading] = useState(false);
   const {productId} = useParams();
   const inputRef = useRef<any>(null);

@@ -13,7 +13,7 @@ import Sidebar from 'component/sidebar/sidebar';
 import Header from 'component/header/header';
 
 export const OrderHistory = () => {
-    const user = useSelector((state: any) => state.auth.user) ?? ''
+    const user = localStorage.getItem('userId') ?? '';
     const { limit } = useSelector((state: any) => state.state)
     const [purchaseHistory, setPurchaseHistory] = useState<PurchaseModal[]>([])
     const [isloading, setIsloading] = useState(false);
@@ -24,7 +24,7 @@ export const OrderHistory = () => {
             if (user) {
                 setIsloading(true);
                 try {
-                    const response = await axios.get(`https://marketplace-3lqw.onrender.com/api/history?owner=${user.uid}&limit=${limit}`)
+                    const response = await axios.get(`https://marketplace-3lqw.onrender.com/api/history?owner=${user}&limit=${limit}`)
                     const convertPaginatedData: PaginatedModal[] = response.data.map((item: PurchaseModal) => {
                         return {
                             _id: item._id,

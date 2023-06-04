@@ -23,7 +23,7 @@ interface Filters {
 function StoreDetails() {
   const dispatch = useDispatch();
   const { countInCart, searchItem } = useSelector((state: any) => state.state);
-  const user = useSelector((state: any) => state.auth.user) ?? '';
+  const user = localStorage.getItem('userId') ?? '';
   const { storeId } = useParams();
   const [storeProducts, setStoreProducts] = useState<ProductModal[]>([]);
   const [isloading, setIsLoading] = useState(false);
@@ -167,7 +167,7 @@ function StoreDetails() {
                 : filteredProducts.map((element: ProductModal) => (
                   <Link to={`/product/${element.owner}/${element._id}`}>
                     <div className='item'>
-                      {user.uid !== storeId ? isInCart(element._id)
+                      {user !== storeId ? isInCart(element._id)
                         ? <button className='add-to-cart' onClick={(event) => handleRemoveFromCart(element._id, element.owner, event)}>
                           <AiFillHeart />
                         </button>
