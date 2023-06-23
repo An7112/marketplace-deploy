@@ -78,7 +78,7 @@ const Signup: React.FC = () => {
                         <p className='text-row text-blur'>
                             You dont have an account yet?
                             <Link to={'/login'}>
-                                <h5>Sign up</h5>
+                                <h5>Login</h5>
                             </Link>
                         </p>
                     </div>
